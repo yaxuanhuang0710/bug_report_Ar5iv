@@ -24,6 +24,7 @@ class Upload(db.Model):
 def page():
     return render_template('output.html')
 
+'''
 @app.route('/form', methods=['GET', 'POST'])
 @cross_origin(supports_credentials=True)
 def form():
@@ -44,6 +45,7 @@ def form():
         db.session.commit()
         return render_template('success.html')
     return render_template('form.html')
+'''
 
 @app.route('/static/<path:path>')
 def serve_static(path):

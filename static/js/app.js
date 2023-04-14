@@ -13,6 +13,31 @@ reportBtn.addEventListener("click", () => {
     modal.style.display = 'block'
   });
 
+function generate_selected_screenshot(){
+  const viewportWidth = document.documentElement.clientWidth;
+  const viewportHeight = document.documentElement.clientHeight;
+  const scrollX = window.scrollX;
+  const scrollY = window.scrollY;
+  html2canvas(document.body, {
+    width: viewportWidth,
+    height: viewportHeight,
+    scrollX: -scrollX,
+    scrollY: -scrollY,
+    windowWidth: document.documentElement.scrollWidth,
+    windowHeight: document.documentElement.scrollHeight,
+    scale: 0.5 // Set the scale to 50% (or any other value you want)
+  }).then((canvas) => {
+    var imageData = canvas.toDataURL("image/png");
+    modal.style.display = 'block';
+    // Set screenshot data in hidden input field or image element
+    document.getElementById("screenshot").value = imageData;
+    document.getElementById("screenshot-image").src = imageData;
+
+    // Show screenshot image or input field
+    document.getElementById("screenshot-image").style= "display: block";
+  });
+};
+
 document.onselectionchange = function () {
     const selectedText = window.getSelection();
     if (selectedText.toString().trim()) {
@@ -49,6 +74,7 @@ document.onselectionchange = function () {
       // Handle the report button click event
       smallReportButton.addEventListener("click", function () {
         //createReportBox();
+        generate_selected_screenshot()
         modal.style.display = 'block'
         smallReportButton.remove();
       });
@@ -96,6 +122,7 @@ document.onselectionchange = function () {
 
 
   document.getElementById("take-screenshot").addEventListener("click", function() {
+    modal.style.display = 'none';
     // Capture screenshot of the whole page
     const viewportWidth = document.documentElement.clientWidth;
     const viewportHeight = document.documentElement.clientHeight;
@@ -108,36 +135,70 @@ document.onselectionchange = function () {
       scrollY: -scrollY,
       windowWidth: document.documentElement.scrollWidth,
       windowHeight: document.documentElement.scrollHeight,
+      scale:0.5
     }).then((canvas) => {
       var imageData = canvas.toDataURL("image/png");
+      modal.style.display = 'block';
       // Set screenshot data in hidden input field or image element
       document.getElementById("screenshot").value = imageData;
       document.getElementById("screenshot-image").src = imageData;
 
       // Show screenshot image or input field
       document.getElementById("screenshot-image").style= "display: block";
-      
-      //const description = document.querySelector(".text-report").value;
-      //if (description) {
-        //sendData(description, base64Screenshot);
-      //} else {
-        //console.error("description not defiend");
-      //}
     });
-
-    //html2canvas(document.documentElement, {scrollY: -window.scrollY}).then(function(canvas) {
-      // Convert canvas to base64-encoded image data
-      //var imageData = canvas.toDataURL("image/png");
-  
-      // Set screenshot data in hidden input field or image element
-      //document.getElementById("screenshot").value = imageData;
-      //document.getElementById("screenshot-image").src = imageData;
-  
-      // Show screenshot image or input field
-      //document.getElementById("screenshot-image").style= "display: block";
-    //});
   });
   
+  function submitBugReport() {
+    document.getElementById('notification').style= 'display: block';
+    /*
+    // Capture a screenshot of the visible portion of the page using html2canvas
+    html2canvas(document.body).then(function(canvas) {
+      // Send the bug report data to the server (you'll need to update the URL and data values)
+      fetch('/submit-bug-report', {
+        method: 'POST',
+        body: JSON.stringify({
+          description: document.getElementById('description').value,
+          screenshot: canvas.toDataURL(),
+        }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }).then(function(response) {
+        // Hide the modal and show the notification
+        //document.getElementById('my-modal').style.display = 'none';
+        document.getElementById('notification').style= 'display: block';
+      });*/
+  }
+
+  document.getElementById("myFormContent").addEventListener("submit", function(event) {
+    submitBugReport()
+    
+    // Extract the browser name and version information
+    var userAgent = navigator.userAgent;
+    var browserInfo = userAgent.match(/(firefox|edge|opr|chrome|safari)[\/]([\d.]+)/i);
+    var browserName = browserInfo[1];
+    var browserVersion = browserInfo[2];
+  
+    //Capitalize the first letter of the browser name
+    browserName = browserName.charAt(0).toUpperCase() + browserName.slice(1);
+  
+    // Print the browser name and version information
+    console.log('Browser:', browserName, browserVersion);
+  });
+
+  close.addEventListener('click', function(event) {
+    // Hide the modal
+    modal.style.display = 'none';
+  });
+  
+  window.addEventListener('click', function(event) {
+    if (event.target == modal) {
+      // Hide the modal if clicked outside
+      modal.style.display = 'none';
+    }
+  })
+  
+  /*
   document.getElementById("myFormContent").addEventListener("submit", function(event) {
     // Prevent form from submitting normally
     event.preventDefault();
@@ -181,7 +242,7 @@ document.onselectionchange = function () {
       // Hide the modal if clicked outside
       modal.style.display = 'none';
     }
-  })
+  })*/
 
 
 /*function createReportBox(x = null, y = null) {
